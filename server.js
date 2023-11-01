@@ -1,33 +1,32 @@
-const express = require("express")
+const express = require("express");
+const cors = require("cors");
+require("dotenv").config();
+const app = express();
+const PORT = process.env.PORT || 8080;
+app.use(cors());
+const data = require("./data/weather.json");
 
-const cors = require("cors")
-
-require("dotenv").config()
-
-const PORT = process.env.PORT || 8080
-
-const app = express()
-
-app.use(cors())
-
-const data = require("./data/weather.json")
-
-function findWeather(lat,lon){
-  return data.filter((weather) => weather.lat == lat && weather.lon == lon || ?weather.lat == lat && ?weather.lon == lon)
-}
-
-app.get("/", (request, response) => {
-  response.json("Test statement")
-})
+app.get("/", (request, response) => response.json("Test statement"));
 
 app.get("/weather", (request, response) => {
-  
-  const weather = getWeather(request.query.weather)
-  response.json(weather)
+	const lat = request.query.lat;
+	const lon = request.query.lon;
+	const searchQuery = request.query.searchQuery;
 
-  const lat 
+	const foundCity = data.find((city) => {
+		return (
+			city.city_name === searchQuery // && city.lat === lat && city.lon === lon
+		);
+	});
 
-  const lon
-})
+	const wrangledData = foundCity.data.map((day) => {
+		return {
+			description: day.weather.description,
+			date: day.datetime,
+		};
+	});
 
-app.listen(PORT, () => console.log(`App is running PORT ${PORT}`))
+	response.json(wrangledData);
+});
+
+app.listen(PORT, () => console.log(`App is running PORT ${PORT}`));
